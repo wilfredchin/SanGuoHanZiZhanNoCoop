@@ -1,0 +1,21 @@
+This workspace is a single-page browser game called “三国汉字战” / “Sanguo Hanzi Battle”, built as a static app with one main HTML shell and several extracted JS/CSS files. The core gameplay mixes Chinese character practice with a Three Kingdoms campaign map, hero roster progression, province conquest, story unlocks.
+
+Main structure:
+index.html  is the main app shell. It contains the DOM for all screens and the remaining runtime logic: title/profile/map/study/story/settings screens, campaign state, province data, map rendering, hero selection, save/load/reset logic, story/province story flow, and battle entry/return logic.
+styles.css  contains the former inline stylesheet.
+tracks.js  exports the static `MP3_TRACKS` map for background music.
+heroes.js  exports `ALL_HEROES`, the 9 playable hero definitions and biographies.
+story-data.js  exports `CHAPTER_ART` and `STORY_CHAPTERS` for the campaign story system.
+battle-ui.js  contains battle rendering and battle flow helpers: enemy rendering, hero bars, question engine, answer handling, damage/progress, victory/defeat screens, combo banners, speech helpers, and battle-specific UI logic.
+sw.js  is the service worker with app/runtime/external caches and a precache list that now includes the extracted files.
+
+Gameplay model:
+The app has multiple screens: title, profile/player selection, world map, battle, victory, defeat, study, stories, province story card, hero bio, and settings/save management.
+Solo mode uses player profiles stored in localStorage, each with difficulty, roster, progress, campaign state, and hero levels.
+Map mode is province-based. Provinces have conquest types: battle, build, or feast. Selecting an accessible province opens the fort panel, and starting a battle creates a wave-based quiz encounter.
+Battle asks Chinese character questions with answer options. Correct answers damage the enemy or advance build/feast progress; wrong answers damage heroes. There is streak, score, retry-queue, and hero HP logic.
+Story systems include province-specific story cards and milestone story chapters unlocked over campaign progress.
+Hero systems include roster discovery, chosen start hero, hero XP/leveling, and campaign rating.
+
+There are asset files such as `sprites/*`, `sounds/*`, `manifest.json`, and app icons, the code references them and the service worker precaches them.
+If you need to work on this app, start from index.html as the integration point, then inspect battle-ui.js for combat/question behavior.
