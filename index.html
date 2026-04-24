@@ -3104,6 +3104,33 @@ const GENERAL_CRIES = {
 // Female generals — get higher-pitched voice
 const FEMALE_GENERALS = new Set(['貂蝉', '祝融', '征侧']);
 
+function _pickBattleCryVoice(isFemale) {
+  const voices = window.speechSynthesis.getVoices().filter(v => (v.lang || '').startsWith('zh'));
+  if (!voices.length) return null;
+
+  const femaleKeywords = /female|ting.?ting|mei.?jia|sin.?ji|yu.?shu|xia.?oxue|hui.?hui|yaoyao|xiaoxiao|nannan|lily|aria|ava|emma|女/i;
+  const maleKeywords = /male|kang.?kang|yun.?xi|yun.?jian|jun|li.?mu|xiaobei|yunjian|yunxi|david|guy|man|男/i;
+
+  const scoreVoice = (voice) => {
+    const haystack = `${voice.name || ''} ${voice.voiceURI || ''}`;
+    let score = 0;
+    if (voice.localService) score += 2;
+    if (voice.default) score += 1;
+    if (isFemale) {
+      if (femaleKeywords.test(haystack)) score += 6;
+      if (maleKeywords.test(haystack)) score -= 4;
+    } else {
+      if (maleKeywords.test(haystack)) score += 6;
+      if (femaleKeywords.test(haystack)) score -= 5;
+    }
+    return score;
+  };
+
+  return voices
+    .map(voice => ({ voice, score: scoreVoice(voice) }))
+    .sort((a, b) => b.score - a.score)[0]?.voice || null;
+}
+
 function _speakBattleCry(text, isFemale) {
   try {
     const u = new SpeechSynthesisUtterance(text);
@@ -3112,18 +3139,8 @@ function _speakBattleCry(text, isFemale) {
     u.rate  = isFemale ? 1.05 : 0.88;
     u.pitch = isFemale ? 1.8  : 0.5;  // female = high & spirited; male = as deep as API allows
 
-    // Try to pick a matching-gender voice if the browser has one
-    const voices = window.speechSynthesis.getVoices();
-    const zhVoices = voices.filter(v => v.lang.startsWith('zh'));
-    if (zhVoices.length > 1) {
-      // Heuristic: female voices often contain 'female', 'Ting-Ting', 'Mei-Jia',
-      // 'Sinji', 'Tingting', 'sin-ji', or are listed after the default male voice
-      const femaleKeywords = /female|ting.?ting|mei.?jia|sin.?ji|yu.?shu|xia.?oxue|hui.?hui|ya|女/i;
-      const femaleV = zhVoices.find(v => femaleKeywords.test(v.name));
-      const maleV   = zhVoices.find(v => !femaleKeywords.test(v.name));
-      if (isFemale && femaleV) u.voice = femaleV;
-      else if (!isFemale && maleV) u.voice = maleV;
-    }
+    const preferredVoice = _pickBattleCryVoice(isFemale);
+    if (preferredVoice) u.voice = preferredVoice;
     return u;
   } catch(e) { return null; }
 }
