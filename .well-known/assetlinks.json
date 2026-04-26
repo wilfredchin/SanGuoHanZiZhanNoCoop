@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.wilfredchin.myapp",
+      "sha256_cert_fingerprints": ["79 2B 6C 8A D7 85 E2 2D 80 97 22 AC 30 4E BE A2 B5 C2 AA 90 43 65 64 BF FA D2 79 27 BE 68 37 C8"]
+    }
+  }
+]
