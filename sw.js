@@ -1,6 +1,6 @@
-const APP_CACHE = 'sanguozhi-app-v8-r3';
-const RUNTIME_CACHE = 'sanguozhi-runtime-v8-r3';
-const EXTERNAL_CACHE = 'sanguozhi-external-v8-r3';
+const APP_CACHE = 'sanguozhi-app-v8-r4';
+const RUNTIME_CACHE = 'sanguozhi-runtime-v8-r4';
+const EXTERNAL_CACHE = 'sanguozhi-external-v8-r4';
 const SCOPE_URL = new URL(self.registration.scope);
 const EXTERNAL_ORIGINS = new Set([
   'https://cdnjs.cloudflare.com',
